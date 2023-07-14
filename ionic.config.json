@@ -1,0 +1,7 @@
+{
+  "name": "Badewanne Österreich Ionic Angular",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
