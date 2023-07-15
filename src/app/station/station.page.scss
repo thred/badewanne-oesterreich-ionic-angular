@@ -1,0 +1,25 @@
+.center-content {
+    display: flex;
+    height: 90vh;
+    flex-direction: column;
+    align-items: stretch;
+    align-content: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 2s ease-in-out;
+
+    &.visible {
+        opacity: 1;
+    }
+}
+
+.time {
+    padding-top: 0.25rem;
+    font-size: 0.9em;
+}
+
+.source {
+    padding-top: 0.25rem;
+    opacity: 0.5;
+    font-size: 0.8em;
+}
