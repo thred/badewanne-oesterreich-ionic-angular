@@ -16,7 +16,7 @@
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
-@import '@ionic/angular/css/display.css';
+@import "@ionic/angular/css/display.css";
 
 /* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
@@ -25,37 +25,9 @@
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-:root {
-	--ion-background-color: #1884ae;
-	--ion-background-color-rgb: 24,132,174;
-
-	--ion-text-color: #ffffff;
-	--ion-text-color-rgb: 255,255,255;
-
-	--ion-color-step-50: #248ab2;
-	--ion-color-step-100: #2f90b6;
-	--ion-color-step-150: #3b96ba;
-	--ion-color-step-200: #469dbe;
-	--ion-color-step-250: #52a3c2;
-	--ion-color-step-300: #5da9c6;
-	--ion-color-step-350: #69afca;
-	--ion-color-step-400: #74b5ce;
-	--ion-color-step-450: #80bbd2;
-	--ion-color-step-500: #8cc2d7;
-	--ion-color-step-550: #97c8db;
-	--ion-color-step-600: #a3cedf;
-	--ion-color-step-650: #aed4e3;
-	--ion-color-step-700: #badae7;
-	--ion-color-step-750: #c5e0eb;
-	--ion-color-step-800: #d1e6ef;
-	--ion-color-step-850: #dcedf3;
-	--ion-color-step-900: #e8f3f7;
-	--ion-color-step-950: #f3f9fb;
-}
-
 ion-fab-button {
-    --background: #ffffff;
-    --background-activated: #ffffff;
-    --background-hover: #ffffff;
-    --color: #1884ae;
-  }
+    --background: var(--ion-text-color);
+    --background-activated: var(--ion-color-step-800);
+    --background-hover: var(--ion-color-step-600);
+    --color: var(--ion-background-color);
+}

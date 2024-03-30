@@ -24,7 +24,7 @@ export class Station {
         readonly source: Source,
         samples: Sample[],
         readonly nextRefreshAtTime: number,
-        readonly error?: string
+        readonly error?: string,
     ) {
         this.samples = samples.sort((a, b) => b.date.valueOf() - a.date.valueOf());
     }

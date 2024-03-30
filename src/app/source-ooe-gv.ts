@@ -37,9 +37,9 @@ export class SourceOoeGv extends Source {
                         stationData.sourceName,
                         stationData.name,
                         stationData.site,
-                        stationData.mostRecentSample?.temperature
-                    )
-            )
+                        stationData.mostRecentSample?.temperature,
+                    ),
+            ),
         );
     }
 
@@ -55,8 +55,8 @@ export class SourceOoeGv extends Source {
                     this,
                     [],
                     this.nextRefreshAtTime,
-                    this.error ?? "Station nicht gefunden."
-                )
+                    this.error ?? "Station nicht gefunden.",
+                ),
         );
     }
 
@@ -193,13 +193,13 @@ export class SourceOoeGv extends Source {
         s = s.replace("M�hring", "Möhring");
         s = s.replace("D�rnau", "Dürnau");
 
-        let a: string[] = [s];
+        // let a: string[] = [s];
 
-        for (let i=0; i<s.length; ++i) {
-            a.push("" + s.charCodeAt(i));
-        }
+        // for (let i=0; i<s.length; ++i) {
+        //     a.push("" + s.charCodeAt(i));
+        // }
 
-        console.log(...a);
+        // console.log(...a);
         return s;
     }
 }

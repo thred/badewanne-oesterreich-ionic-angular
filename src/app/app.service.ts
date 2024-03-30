@@ -28,7 +28,11 @@ export class AppService {
         return this._station;
     }
 
-    constructor(private readonly stationService: StationService, storage: Storage, private readonly router: Router) {
+    constructor(
+        private readonly stationService: StationService,
+        storage: Storage,
+        private readonly router: Router,
+    ) {
         storage.create().then(async (storage) => {
             this.storage = storage;
 
@@ -41,7 +45,7 @@ export class AppService {
                 this._station = await this.stationService.getStation(
                     this._reference!.sourceName,
                     this._reference!.stationName,
-                    this._reference!.stationSite
+                    this._reference!.stationSite,
                 );
             }
         });
@@ -65,7 +69,7 @@ export class AppService {
         this._station = await this.stationService.getStation(
             reference.sourceName,
             reference.stationName,
-            reference.stationSite
+            reference.stationSite,
         );
     }
 

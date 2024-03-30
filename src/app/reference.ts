@@ -7,6 +7,6 @@ export class Reference {
         readonly sourceName: string,
         readonly stationName: string | undefined,
         readonly stationSite: string | undefined,
-        readonly temperature: number | undefined
+        readonly temperature: number | undefined,
     ) {}
 }

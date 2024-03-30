@@ -13,14 +13,17 @@
 
     <ion-loading [isOpen]="!references.length" message="Lade ..." duration="3000"></ion-loading>
 
-    <ion-list *ngIf="references.length">
-        <ion-item *ngFor="let reference of references">
+    @if (references.length) {
+    <ion-list>
+        @for (reference of references; track reference.key) {
+        <ion-item>
             <ion-label (click)="openStation(reference)">
                 <h2>{{reference.stationName}}</h2>
                 <p>{{reference.stationSite}}</p>
             </ion-label>
-
             <ion-note>{{reference.temperature?.toFixed(1)}}°C</ion-note>
         </ion-item>
+        }
     </ion-list>
+    }
 </ion-content>

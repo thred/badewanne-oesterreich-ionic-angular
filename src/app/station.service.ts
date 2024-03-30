@@ -10,8 +10,8 @@ import { SourceOoeGv } from "./source-ooe-gv";
     providedIn: "root",
 })
 export class StationService {
-    //private readonly sources: Source[] = [new SourceOoeGvMock()];
-    private readonly sources: Source[] = [new SourceOoeGv()];
+    private readonly sources: Source[] = [new SourceOoeGvMock()];
+    // private readonly sources: Source[] = [new SourceOoeGv()];
 
     readonly references: Reference[] = [];
 
@@ -42,7 +42,7 @@ export class StationService {
             (a, b) =>
                 a.stationName?.localeCompare(b?.stationName ?? "") ||
                 a.stationSite?.localeCompare(b?.stationSite ?? "") ||
-                0
+                0,
         );
 
         this.references$.next(this.references);
