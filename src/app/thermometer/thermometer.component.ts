@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, OnInit, input } from "@angular/core";
 import { OnTypedChanges, TypedChanges, Utils } from "../utils";
 import { createAnimation } from "@ionic/angular";
 
@@ -6,20 +6,18 @@ import { createAnimation } from "@ionic/angular";
     selector: "app-thermometer",
     templateUrl: "./thermometer.component.html",
     styleUrls: ["./thermometer.component.scss"],
+    standalone: false
 })
 export class ThermometerComponent implements OnInit, OnTypedChanges<ThermometerComponent> {
-    @Input()
-    temperature: number = 0.0;
+    readonly temperature = input<number>(0.0);
 
     currentTemperature: number = 0.0;
 
     animationStart?: number;
 
-    @Input()
-    color: string = "white";
+    readonly color = input<string>("white");
 
-    @Input()
-    textColor: string = "#1884ae";
+    readonly textColor = input<string>("#1884ae");
 
     constructor() {}
 
@@ -36,10 +34,10 @@ export class ThermometerComponent implements OnInit, OnTypedChanges<ThermometerC
         const dt = (t - (this.animationStart ?? t)) / 1000;
         this.animationStart = t;
 
-        if (Math.abs(this.temperature - this.currentTemperature) < 0.01) {
-            this.currentTemperature = this.temperature;
+        if (Math.abs(this.temperature() - this.currentTemperature) < 0.01) {
+            this.currentTemperature = this.temperature();
         } else {
-            this.currentTemperature = Utils.lerp(this.currentTemperature, this.temperature, 2 * dt);
+            this.currentTemperature = Utils.lerp(this.currentTemperature, this.temperature(), 2 * dt);
             requestAnimationFrame((t) => this.animate(t));
         }
     }

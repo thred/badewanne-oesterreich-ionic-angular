@@ -1,11 +1,11 @@
 <ion-content [fullscreen]="true" class="ion-padding">
     <ion-fab vertical="bottom" horizontal="center" slot="fixed">
         <ion-fab-button (click)="openStationList()">
-            <ion-icon name="menu-outline"></ion-icon>
+            <ion-icon name="menu-outline" />
         </ion-fab-button>
     </ion-fab>
 
-    <ion-loading [isOpen]="!reference" message="Lade ..." duration="3000"></ion-loading>
+    <ion-loading [isOpen]="!reference" message="Lade ..." duration="3000" />
 
     <div class="center-content" [class.visible]="reference">
         <app-thermometer [temperature]="station?.mostRecentTemperature ?? 0"></app-thermometer>

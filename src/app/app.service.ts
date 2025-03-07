@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { Injectable, inject } from "@angular/core";
 import { Reference } from "./reference";
 import { StationService } from "./station.service";
 import { Station } from "./station";
@@ -10,6 +10,9 @@ import { Storage } from "@ionic/storage-angular";
     providedIn: "root",
 })
 export class AppService {
+    private readonly stationService = inject(StationService);
+    private readonly router = inject(Router);
+
     private storage?: Storage;
 
     private _reference?: Reference;
@@ -28,11 +31,9 @@ export class AppService {
         return this._station;
     }
 
-    constructor(
-        private readonly stationService: StationService,
-        storage: Storage,
-        private readonly router: Router,
-    ) {
+    constructor() {
+        const storage = inject(Storage);
+
         storage.create().then(async (storage) => {
             this.storage = storage;
 

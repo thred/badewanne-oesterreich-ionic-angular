@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { AppService } from "../app.service";
 import { Reference } from "../reference";
 import { Station } from "../station";
@@ -8,8 +8,11 @@ import { Utils } from "../utils";
     selector: "app-station",
     templateUrl: "./station.page.html",
     styleUrls: ["./station.page.scss"],
+    standalone: false
 })
 export class StationPage implements OnInit {
+    private readonly appService = inject(AppService);
+
     get reference(): Reference | undefined {
         return this.appService.reference;
     }
@@ -23,8 +26,6 @@ export class StationPage implements OnInit {
 
         return date ? Utils.passedSince(date) : "keine aktuellen Daten vorhanden";
     }
-
-    constructor(private readonly appService: AppService) {}
 
     ngOnInit(): void {
         // If loading of a station fails ...
