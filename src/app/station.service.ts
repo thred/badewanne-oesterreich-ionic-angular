@@ -1,17 +1,16 @@
 import { Injectable } from "@angular/core";
-import { Source } from "./source";
-import { SourceOoeGvMock } from "./source-ooe-gv-mock";
-import { Station } from "./station";
-import { Reference } from "./reference";
 import { Subject } from "rxjs";
+import { Reference } from "./reference";
+import { Source } from "./source";
 import { SourceOoeGv } from "./source-ooe-gv";
+import { Station } from "./station";
 
 @Injectable({
     providedIn: "root",
 })
 export class StationService {
-    private readonly sources: Source[] = [new SourceOoeGvMock()];
-    // private readonly sources: Source[] = [new SourceOoeGv()];
+    // private readonly sources: Source[] = [new SourceOoeGvMock()];
+    private readonly sources: Source[] = [new SourceOoeGv()];
 
     readonly references: Reference[] = [];
 

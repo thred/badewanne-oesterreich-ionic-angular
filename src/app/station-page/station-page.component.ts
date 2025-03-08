@@ -3,14 +3,16 @@ import { AppService } from "../app.service";
 import { Reference } from "../reference";
 import { Station } from "../station";
 import { Utils } from "../utils";
+import { IonicModule } from "@ionic/angular";
+import { ThermometerComponent } from "../thermometer/thermometer.component";
 
 @Component({
-    selector: "app-station",
-    templateUrl: "./station.page.html",
-    styleUrls: ["./station.page.scss"],
-    standalone: false
+    selector: "app-station-page",
+    templateUrl: "./station-page.component.html",
+    styleUrls: ["./station-page.component.scss"],
+    imports: [IonicModule, ThermometerComponent],
 })
-export class StationPage implements OnInit {
+export class StationPageComponent implements OnInit {
     private readonly appService = inject(AppService);
 
     get reference(): Reference | undefined {

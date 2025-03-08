@@ -22,7 +22,7 @@ export class SourceOoeGv extends Source {
     }
 
     get link(): string {
-        return "https://www.land-oberoesterreich.gv.at/142236.htm";
+        return "https://e-gov.ooe.gv.at/at.gv.ooe.ogd2-citi/#/detail/586e08a5-1ca6-400b-b2e2-dfd8fd3f429d";
     }
 
     get interval(): number {
@@ -192,6 +192,7 @@ export class SourceOoeGv extends Source {
         s = s.replace("stra�e", "straße");
         s = s.replace("M�hring", "Möhring");
         s = s.replace("D�rnau", "Dürnau");
+        s = s.replace("B�rgelstein", "Bürgelstein");
 
         // let a: string[] = [s];
 

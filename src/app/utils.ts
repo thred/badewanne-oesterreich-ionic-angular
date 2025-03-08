@@ -1,18 +1,3 @@
-export interface TypedChange<T> {
-    previousValue: T;
-    currentValue: T;
-    firstChange: boolean;
-    isFirstChange(): boolean;
-}
-
-export type TypedChanges<T> = {
-    [P in keyof T]?: TypedChange<T[P]>;
-};
-
-export interface OnTypedChanges<T> {
-    ngOnChanges(changes: TypedChanges<T>): void;
-}
-
 export class Utils {
     static arrayDistinct<T>(arr: T[]): T[] {
         return arr.filter((value, index, self) => self.indexOf(value) === index);

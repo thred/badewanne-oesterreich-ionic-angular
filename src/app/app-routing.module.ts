@@ -1,7 +1,5 @@
 import { NgModule } from "@angular/core";
 import { PreloadAllModules, RouterModule, Routes } from "@angular/router";
-import { StationsPage } from "./station-list/station-list.page";
-import { StationPage } from "./station/station.page";
 
 const routes: Routes = [
     {
@@ -11,11 +9,12 @@ const routes: Routes = [
     },
     {
         path: "stations",
-        component: StationsPage,
+        loadComponent: () =>
+            import("./station-list-page/station-list-page.component").then((m) => m.StationListPageComponent),
     },
     {
         path: "station",
-        component: StationPage,
+        loadComponent: () => import("./station-page/station-page.component").then((m) => m.StationPageComponent),
     },
 ];
 

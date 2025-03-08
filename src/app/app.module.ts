@@ -4,16 +4,24 @@ import { RouteReuseStrategy } from "@angular/router";
 
 import { IonicModule, IonicRouteStrategy } from "@ionic/angular";
 
-import { AppComponent } from "./app.component";
-import { AppRoutingModule } from "./app-routing.module";
-import { ThermometerComponent } from "./thermometer/thermometer.component";
-import { StationsPage } from "./station-list/station-list.page";
-import { StationPage } from "./station/station.page";
 import { IonicStorageModule } from "@ionic/storage-angular";
+import { AppRoutingModule } from "./app-routing.module";
+import { AppComponent } from "./app.component";
+import { StationListPageComponent } from "./station-list-page/station-list-page.component";
+import { StationPageComponent } from "./station-page/station-page.component";
+import { ThermometerComponent } from "./thermometer/thermometer.component";
 
 @NgModule({
-    declarations: [AppComponent, StationPage, StationsPage, ThermometerComponent],
-    imports: [BrowserModule, IonicModule.forRoot(), IonicStorageModule.forRoot(), AppRoutingModule],
+    declarations: [AppComponent],
+    imports: [
+        BrowserModule,
+        IonicModule.forRoot(),
+        IonicStorageModule.forRoot(),
+        AppRoutingModule,
+        StationPageComponent,
+        StationListPageComponent,
+        ThermometerComponent,
+    ],
     providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
     exports: [ThermometerComponent],
     bootstrap: [AppComponent],

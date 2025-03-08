@@ -7,9 +7,9 @@
 
     <rect
         x="152"
-        [attr.y]="219 - currentTemperature * 6.4"
+        [attr.y]="219 - currentTemperature() * 6.4"
         width="16"
-        [attr.height]="currentTemperature * 6.4"
+        [attr.height]="currentTemperature() * 6.4"
         rx="8"
         ry="2"
         [attr.fill]="color()"
@@ -32,6 +32,6 @@
     </g>
 
     <text x="160" y="268" [attr.fill]="textColor()" font-family="sans-serif" font-size="40px" text-anchor="middle">
-        {{ currentTemperature.toFixed(1) }}
+        {{ currentTemperature().toFixed(1) }}
     </text>
 </svg>

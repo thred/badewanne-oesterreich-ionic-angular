@@ -10,11 +10,15 @@
     <div class="center-content" [class.visible]="reference">
         <app-thermometer [temperature]="station?.mostRecentTemperature ?? 0"></app-thermometer>
 
-        <ion-text class="ion-text-center"><h2>{{reference?.stationName}}</h2></ion-text>
+        <ion-text class="ion-text-center"
+            ><h2>{{ reference?.stationName }}</h2></ion-text
+        >
 
-        <ion-text class="ion-text-center">{{reference?.stationSite}}</ion-text>
-        <ion-text class="ion-text-center time">{{passedSince}}</ion-text>
+        <ion-text class="ion-text-center">{{ reference?.stationSite }}</ion-text>
+        <ion-text class="ion-text-center time">{{ passedSince }}</ion-text>
 
-        <ion-text class="ion-text-center source" (click)="openSourceLink()">Quelle: {{reference?.sourceName}}</ion-text>
+        <ion-text class="ion-text-center source" (click)="openSourceLink()"
+            >Quelle: {{ reference?.sourceName }}</ion-text
+        >
     </div>
 </ion-content>

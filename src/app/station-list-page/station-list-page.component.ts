@@ -1,14 +1,15 @@
 import { Component, inject } from "@angular/core";
-import { Reference } from "../reference";
 import { AppService } from "../app.service";
+import { Reference } from "../reference";
+import { IonicModule } from "@ionic/angular";
 
 @Component({
-    selector: "app-stations",
-    templateUrl: "./station-list.page.html",
-    styleUrls: ["./station-list.page.scss"],
-    standalone: false
+    selector: "app-station-list-page",
+    templateUrl: "./station-list-page.component.html",
+    styleUrls: ["./station-list-page.component.scss"],
+    imports: [IonicModule],
 })
-export class StationsPage {
+export class StationListPageComponent {
     private readonly appService = inject(AppService);
 
     get references(): Reference[] {
