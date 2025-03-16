@@ -1,4 +1,4 @@
 export interface Sample {
-    date: Date;
     temperature: number;
+    measuredAt: Date;
 }

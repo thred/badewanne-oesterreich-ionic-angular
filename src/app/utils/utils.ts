@@ -1,4 +1,19 @@
 export class Utils {
+    static toKey(...names: string[]): string {
+        return names
+            .map((name) => name.trim())
+            .map((name) => name.toLowerCase())
+            .map((name) => name.replace(/ä/g, "ae"))
+            .map((name) => name.replace(/ö/g, "oe"))
+            .map((name) => name.replace(/ü/g, "ue"))
+            .map((name) => name.replace(/ß/g, "ss"))
+            .map((name) => name.replace(/[^a-zA-Z0-9]/g, "-"))
+            .join("-")
+            .replace(/--+/g, "-")
+            .replace(/^-+/, "")
+            .replace(/-+$/, "");
+    }
+
     static arrayDistinct<T>(arr: T[]): T[] {
         return arr.filter((value, index, self) => self.indexOf(value) === index);
     }

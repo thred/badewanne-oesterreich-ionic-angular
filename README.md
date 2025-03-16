@@ -16,7 +16,7 @@ Prepare with `npm ci`.
 
 Build with `npm run build`.
 
-Build Androdi: `npm run build`, `npm run android:open`, then Build | Build APK. You need Android Studio.
+Build Android: `npm run build`, `npm run android:open`, then Build | Build APK. You need Android Studio.
 
 # License
 

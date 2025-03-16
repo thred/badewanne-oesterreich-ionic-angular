@@ -1,17 +1,24 @@
-import { Reference } from "./reference";
-import { Sample } from "./sample";
-import { Source } from "./source";
-import { Station } from "./station";
-import { Utils } from "./utils";
+import { Reference } from "src/app/station/reference";
+import { Sample } from "src/app/station/sample";
+import { Station } from "src/app/station/station";
+import { Utils } from "../../utils/utils";
+import { Source } from "../source";
+import { OoeGvItem } from "./ooe-gv.item";
 
 const url: string = "https://data.ooe.gv.at/files/hydro/HDOOE_Export_WT.zrxp";
 
-export class SourceOoeGv extends Source {
-    private refreshedAtTime: number = Date.now();
-    private nextRefreshAtTime: number = Date.now();
-    private stations?: Promise<Station[]>;
+export class OoeGvSource implements Source {
+    private static readonly MINIMUM_POLLING_INTERVAL: number = 1000 * 60 * 5; // 5 minutes
+
+    private polledAt: Date = new Date();
+    private nextPollAtMillis: number = this.polledAt.getTime();
+    private items?: Promise<OoeGvItem[]>;
     private error?: string;
     private loading: boolean = false;
+
+    get key(): string {
+        return "ooe-gv";
+    }
 
     get name(): string {
         return "Hydrographischer Dienst Oberösterreich";
@@ -25,55 +32,86 @@ export class SourceOoeGv extends Source {
         return "https://e-gov.ooe.gv.at/at.gv.ooe.ogd2-citi/#/detail/586e08a5-1ca6-400b-b2e2-dfd8fd3f429d";
     }
 
-    get interval(): number {
-        return 1000 * 60 * 5;
+    get minimumPollingInterval(): number {
+        return OoeGvSource.MINIMUM_POLLING_INTERVAL;
     }
 
-    getReferences(): Promise<Reference[]> {
-        return this.getStations().then((stationDatas) =>
-            stationDatas.map(
-                (stationData) =>
-                    new Reference(
-                        stationData.sourceName,
-                        stationData.name,
-                        stationData.site,
-                        stationData.mostRecentSample?.temperature,
-                    ),
-            ),
-        );
-    }
+    async getReferences(): Promise<Reference[]> {
+        const items = await this.getItems();
 
-    getStation(name?: string, site?: string): Promise<Station> {
-        return this.getStations().then(
-            (stationDatas) =>
-                stationDatas.find((s) => s.name === name && s.site === site) ??
-                stationDatas.find((s) => s.name === name) ??
-                stationDatas.find((s) => s.site === site) ??
-                new Station(
-                    name ?? "Unbekannt",
-                    site ?? "Unbekannt",
-                    this,
-                    [],
-                    this.nextRefreshAtTime,
-                    this.error ?? "Station nicht gefunden.",
+        return items.map(
+            (item) =>
+                new Reference(
+                    this.key,
+                    this.name,
+                    item.key,
+                    item.name,
+                    item.site,
+                    item.temperature,
+                    item.measuredAt,
+                    item.polledAt,
+                    item.error,
                 ),
         );
     }
 
-    protected async getStations(): Promise<Station[]> {
-        if (Date.now() < this.nextRefreshAtTime && this.stations) {
-            return this.stations;
+    async getStation(key: string): Promise<Station> {
+        const items = await this.getItems();
+        const item = items.find((s) => s.key === key);
+
+        if (item) {
+            return new Station(
+                this.key,
+                this.name,
+                item.key,
+                item.name,
+                item.site,
+                item.temperature,
+                item.measuredAt,
+                item.samples,
+                item.polledAt,
+                item.error,
+            );
         }
 
-        this.refreshedAtTime = Date.now();
-        this.nextRefreshAtTime = Date.now() + this.interval;
+        let error = `The item "${key}" is missing in the data of "${this.name}".`;
+
+        if (this.error) {
+            error += ` ${this.error}`;
+        }
+
+        return new Station(
+            this.key,
+            this.name,
+            key,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            [],
+            this.polledAt,
+            this.error,
+        );
+    }
+
+    protected async getItems(): Promise<OoeGvItem[]> {
+        const polledAt: Date = new Date();
+        const polledAtMillis = polledAt.getTime();
+
+        // Do not poll too often
+        if (polledAtMillis < this.nextPollAtMillis && this.items) {
+            return this.items;
+        }
+
+        this.polledAt = polledAt;
+        this.nextPollAtMillis = polledAtMillis + this.minimumPollingInterval;
         this.error = undefined;
 
-        this.stations = new Promise(async (resolve) => {
+        this.items = new Promise(async (resolve) => {
             try {
                 let binary: string = await this.fetchData();
 
-                resolve(this.parse(binary));
+                resolve(this.parse(binary, polledAt));
             } catch (error) {
                 this.error = `${error}`;
 
@@ -81,7 +119,7 @@ export class SourceOoeGv extends Source {
             }
         });
 
-        return this.stations;
+        return this.items;
     }
 
     protected async fetchData(): Promise<string> {
@@ -92,24 +130,32 @@ export class SourceOoeGv extends Source {
         return await response.text();
     }
 
-    protected parse(binary: string): Station[] {
-        const stationBinaries: string[] = binary
+    protected parse(binary: string, polledAt: Date): OoeGvItem[] {
+        const itemBinaries: string[] = binary
             .split("#ZRXPVERSION")
             .map((s) => s.trim())
             .filter((s) => s.length);
 
-        return stationBinaries
-            .map((stationBinary) => this.parseStation(stationBinary))
-            .filter((station) => station) as Station[];
+        return itemBinaries
+            .map((itemBinary) => this.parseItem(itemBinary, polledAt))
+            .filter((item) => item) as OoeGvItem[];
     }
 
-    protected parseStation(stationBinary: string): Station | undefined {
-        const columns: string[] = stationBinary.split("|");
+    protected parseItem(itemBinary: string, polledAt: Date): OoeGvItem | undefined {
+        const columns: string[] = itemBinary.split("|");
+
+        let sourceIdColumn: string | undefined = columns.find((column) => column.startsWith("SOURCEID"));
+
+        if (!sourceIdColumn) {
+            Utils.warn(`SOURCEID is missing in: ${itemBinary.substring(0, 512)} ...`);
+
+            sourceIdColumn = "SOURCEID";
+        }
 
         let waterColumn: string | undefined = columns.find((column) => column.startsWith("SWATER"));
 
         if (!waterColumn) {
-            Utils.warn(`SWATER is missing in: ${stationBinary.substring(0, 512)} ...`);
+            Utils.warn(`SWATER is missing in: ${itemBinary.substring(0, 512)} ...`);
 
             waterColumn = "SWATER";
         }
@@ -117,7 +163,7 @@ export class SourceOoeGv extends Source {
         const siteColumn: string | undefined = columns.find((column) => column.startsWith("SNAME"));
 
         if (!siteColumn) {
-            Utils.warn(`SNAME is missing in: ${stationBinary.substring(0, 512)} ...`);
+            Utils.warn(`SNAME is missing in: ${itemBinary.substring(0, 512)} ...`);
             return undefined;
         }
 
@@ -127,7 +173,7 @@ export class SourceOoeGv extends Source {
         const temperatureColumn: string | undefined = columns.find((column) => column.match(/\d{14}\s\d/)?.length);
 
         if (!temperatureColumn) {
-            //Utils.warn(`Temperatures are missing in: ${stationBinary.substring(0, 512)} ...`);
+            //Utils.warn(`Temperatures are missing in: ${itemBinary.substring(0, 512)} ...`);
         } else {
             const lines: string[] = temperatureColumn
                 .split(/\n/)
@@ -157,14 +203,22 @@ export class SourceOoeGv extends Source {
                 const temperature: number = parseFloat(token[1]);
 
                 if (!isNaN(temperature) && temperature > -20 && temperature < 100) {
-                    samples.push({ date, temperature });
+                    samples.push({ measuredAt: date, temperature });
                 }
             }
         }
 
-        return new Station(water, site, this, samples, this.nextRefreshAtTime, undefined);
+        return new OoeGvItem(Utils.toKey(water, site), water, site, samples, polledAt);
     }
 
+    /**
+     * The reported encoding of the call and the actual encoding of the data are different. In fact, the encoding
+     * seems to be lost earlier in the process, because the file contains invalid characters in multiple encodings.
+     * This method tries to fix this for the most common cases.
+     *
+     * @param s the string to sanitize
+     * @returns sanitized string
+     */
     private sanitizeInvalidEncoding(s: string): string {
         s = s.replace("Ã¤", "ä");
         s = s.replace("Ã¶", "ö");
@@ -192,15 +246,11 @@ export class SourceOoeGv extends Source {
         s = s.replace("stra�e", "straße");
         s = s.replace("M�hring", "Möhring");
         s = s.replace("D�rnau", "Dürnau");
-        s = s.replace("B�rgelstein", "Bürgelstein");
+        s = s.replace("B�rglstein", "Bürglstein");
+        s = s.replace("Bootsh�tte", "Bootshütte");
+        s = s.replace("Wei�enbach", "Weißenbach");
+        s = s.replace("Fu�g�ngersteg", "Fußgängersteg");
 
-        // let a: string[] = [s];
-
-        // for (let i=0; i<s.length; ++i) {
-        //     a.push("" + s.charCodeAt(i));
-        // }
-
-        // console.log(...a);
         return s;
     }
 }

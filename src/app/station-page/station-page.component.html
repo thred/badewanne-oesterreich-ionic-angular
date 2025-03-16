@@ -5,20 +5,22 @@
         </ion-fab-button>
     </ion-fab>
 
-    <ion-loading [isOpen]="!reference" message="Lade ..." duration="3000" />
+    <ion-loading [isOpen]="loading()" message="Lade ..." duration="3000" />
 
-    <div class="center-content" [class.visible]="reference">
-        <app-thermometer [temperature]="station?.mostRecentTemperature ?? 0"></app-thermometer>
+    @if (station(); as station) {
+        <div class="center-content" [class.visible]="!loading()">
+            <app-thermometer [temperature]="station.temperature ?? 0"></app-thermometer>
 
-        <ion-text class="ion-text-center"
-            ><h2>{{ reference?.stationName }}</h2></ion-text
-        >
+            <ion-text class="ion-text-center"
+                ><h2>{{ station.label }}</h2></ion-text
+            >
 
-        <ion-text class="ion-text-center">{{ reference?.stationSite }}</ion-text>
-        <ion-text class="ion-text-center time">{{ passedSince }}</ion-text>
+            <ion-text class="ion-text-center">{{ station.site }}</ion-text>
+            <ion-text class="ion-text-center time">{{ passedSince }}</ion-text>
 
-        <ion-text class="ion-text-center source" (click)="openSourceLink()"
-            >Quelle: {{ reference?.sourceName }}</ion-text
-        >
-    </div>
+            <ion-text class="ion-text-center source" (click)="openSourceLink()"
+                >Quelle: {{ station.sourceName }}</ion-text
+            >
+        </div>
+    }
 </ion-content>

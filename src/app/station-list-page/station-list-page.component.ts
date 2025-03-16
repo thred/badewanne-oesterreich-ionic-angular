@@ -1,7 +1,8 @@
-import { Component, inject } from "@angular/core";
-import { AppService } from "../app.service";
-import { Reference } from "../reference";
+import { Component, computed, inject } from "@angular/core";
 import { IonicModule } from "@ionic/angular";
+import { AppService } from "../app.service";
+import { Reference } from "../station/reference";
+import { StationService } from "../station/station.service";
 
 @Component({
     selector: "app-station-list-page",
@@ -11,10 +12,16 @@ import { IonicModule } from "@ionic/angular";
 })
 export class StationListPageComponent {
     private readonly appService = inject(AppService);
+    private readonly stationService = inject(StationService);
 
-    get references(): Reference[] {
-        return this.appService.references;
-    }
+    readonly references = computed(() => {
+        const referenceMap = this.stationService.referenceMap();
+        const references = Object.values(referenceMap);
+
+        references.sort((a, b) => a.label.localeCompare(b.label) || a.site.localeCompare(b.site));
+
+        return references;
+    });
 
     openStation(reference: Reference): void {
         this.appService.openStation(reference);

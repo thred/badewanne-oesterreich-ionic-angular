@@ -1,6 +1,6 @@
 import { Component, input, signal } from "@angular/core";
 import { takeUntilDestroyed, toObservable } from "@angular/core/rxjs-interop";
-import { Utils } from "../utils";
+import { Utils } from "../utils/utils";
 
 @Component({
     selector: "app-thermometer",

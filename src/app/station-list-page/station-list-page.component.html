@@ -13,9 +13,9 @@
 
     <ion-loading [isOpen]="!references.length" message="Lade ..." duration="3000" />
 
-    @if (references.length) {
+    @if (references().length) {
         <ion-list>
-            @for (reference of references; track reference.key) {
+            @for (reference of references(); track reference.combinedKey) {
                 <ion-item>
                     <ion-label (click)="openStation(reference)">
                         <h2>{{ reference.stationName }}</h2>

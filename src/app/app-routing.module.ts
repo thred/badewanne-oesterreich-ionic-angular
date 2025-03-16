@@ -13,7 +13,7 @@ const routes: Routes = [
             import("./station-list-page/station-list-page.component").then((m) => m.StationListPageComponent),
     },
     {
-        path: "station",
+        path: "station/:sourceKey/:stationKey",
         loadComponent: () => import("./station-page/station-page.component").then((m) => m.StationPageComponent),
     },
 ];

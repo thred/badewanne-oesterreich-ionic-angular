@@ -1,10 +1,12 @@
-import { Component, OnInit, inject } from "@angular/core";
-import { AppService } from "../app.service";
-import { Reference } from "../reference";
-import { Station } from "../station";
-import { Utils } from "../utils";
+import { Component, computed, inject } from "@angular/core";
 import { IonicModule } from "@ionic/angular";
+import { AppService } from "../app.service";
+import { Station } from "../station/station";
+import { StationService } from "../station/station.service";
 import { ThermometerComponent } from "../thermometer/thermometer.component";
+import { promisedSignal } from "../utils/pomised.signal";
+import { routeParamSignal } from "../utils/route-param.signal";
+import { Utils } from "../utils/utils";
 
 @Component({
     selector: "app-station-page",
@@ -12,30 +14,31 @@ import { ThermometerComponent } from "../thermometer/thermometer.component";
     styleUrls: ["./station-page.component.scss"],
     imports: [IonicModule, ThermometerComponent],
 })
-export class StationPageComponent implements OnInit {
+export class StationPageComponent {
     private readonly appService = inject(AppService);
+    private readonly stationService = inject(StationService);
 
-    get reference(): Reference | undefined {
-        return this.appService.reference;
-    }
+    readonly sourceKey = routeParamSignal<string | undefined>("sourceKey");
 
-    get station(): Station | undefined {
-        return this.appService.station;
-    }
+    readonly stationKey = routeParamSignal<string | undefined>("stationKey");
+
+    readonly station = promisedSignal<Station | undefined>(() => {
+        const sourceKey = this.sourceKey();
+        const stationKey = this.stationKey();
+
+        if (!sourceKey || !stationKey) {
+            return undefined;
+        }
+
+        return this.stationService.getStation(sourceKey, stationKey);
+    });
+
+    readonly loading = computed(() => this.station() === undefined);
 
     get passedSince(): string {
-        const date: Date | undefined = this.station?.mostRecentSample?.date;
+        const date: Date | undefined = this.station()?.measuredAt;
 
         return date ? Utils.passedSince(date) : "keine aktuellen Daten vorhanden";
-    }
-
-    ngOnInit(): void {
-        // If loading of a station fails ...
-        window.setTimeout(() => {
-            if (!this.reference) {
-                this.openStationList();
-            }
-        }, 2000);
     }
 
     openStationList(): void {
@@ -43,8 +46,10 @@ export class StationPageComponent implements OnInit {
     }
 
     openSourceLink(): void {
-        if (this.reference) {
-            this.appService.openSourceLink(this.reference.sourceName);
+        const station = this.station();
+
+        if (station) {
+            this.appService.openSourceLink(station.sourceKey);
         }
     }
 }
