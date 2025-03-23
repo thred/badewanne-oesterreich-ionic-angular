@@ -1,8 +1,11 @@
+import { Station } from "src/app/station/station";
 import { Utils } from "../../utils/utils";
 import { OoeGvItem } from "./ooe-gv.item";
 import { OoeGvSource } from "./ooe-gv.source";
 
 export class OoeGvSourceMock extends OoeGvSource {
+    refreshCount: number = 4;
+
     override get name(): string {
         return "Hydrographischer Dienst Oberösterreich (Mock)";
     }
@@ -12,19 +15,24 @@ export class OoeGvSourceMock extends OoeGvSource {
     }
 
     override get minimumPollingInterval(): number {
-        return 1000 * 10;
+        return 1000 * 20;
+    }
+
+    override async getAllStations(): Promise<Station[]> {
+        return super.getAllStations();
     }
 
     protected override async fetchData(): Promise<string> {
         Utils.info(`Fetching mocked data ...`);
 
+        if (++this.refreshCount % 5 === 0) {
+            throw new Error("Failed to fetch mocked data. This is a simulated error for testing.");
+        }
+
         return new Promise((resolve) => {
-            setTimeout(
-                () => {
-                    resolve(binary);
-                },
-                Math.random() * 5 * 1000,
-            );
+            setTimeout(() => {
+                resolve(binary);
+            }, 5000); // simulated lag
         });
     }
 

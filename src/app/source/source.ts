@@ -1,4 +1,3 @@
-import { Reference } from "../station/reference";
 import { Station } from "../station/station";
 
 export interface Source {
@@ -10,7 +9,7 @@ export interface Source {
 
     get link(): string;
 
-    getReferences(): Promise<Reference[]>;
+    getAllStations(): Promise<Station[]>;
 
     getStation(key: string): Promise<Station>;
 }

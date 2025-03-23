@@ -1,26 +1,32 @@
-<ion-content [fullscreen]="true" class="ion-padding">
-    <ion-fab vertical="bottom" horizontal="center" slot="fixed">
-        <ion-fab-button (click)="openStationList()">
-            <ion-icon name="menu-outline" />
-        </ion-fab-button>
-    </ion-fab>
+<ion-content [fullscreen]="true">
+    <ion-refresher slot="fixed" (ionRefresh)="performRefresh($event)" [pullMin]="25" [pullMax]="50" />
 
-    <ion-loading [isOpen]="loading()" message="Lade ..." duration="3000" />
+    <div class="center-content">
+        <app-error-list (refresh)="performRefresh()" [maxErrors]="1" />
 
-    @if (station(); as station) {
-        <div class="center-content" [class.visible]="!loading()">
-            <app-thermometer [temperature]="station.temperature ?? 0"></app-thermometer>
+        <app-thermometer class="scale" [temperature]="station()?.temperature ?? 0"></app-thermometer>
 
+        <div class="text-content">
             <ion-text class="ion-text-center"
-                ><h2>{{ station.label }}</h2></ion-text
+                ><h2>{{ station()?.label ?? "Daten werden geladen ..." }}</h2></ion-text
             >
 
-            <ion-text class="ion-text-center">{{ station.site }}</ion-text>
+            <ion-text class="ion-text-center">{{ station()?.site ?? "-" }}</ion-text>
             <ion-text class="ion-text-center time">{{ passedSince }}</ion-text>
 
             <ion-text class="ion-text-center source" (click)="openSourceLink()"
-                >Quelle: {{ station.sourceName }}</ion-text
+                >Quelle: {{ station()?.sourceName }}</ion-text
             >
         </div>
-    }
+    </div>
+
+    <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+        <ion-fab-button (click)="openStationList()">
+            @if (loading()) {
+                <ion-spinner name="crescent" color="dark"></ion-spinner>
+            } @else {
+                <ion-icon name="menu-outline" />
+            }
+        </ion-fab-button>
+    </ion-fab>
 </ion-content>

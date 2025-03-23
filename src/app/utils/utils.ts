@@ -14,38 +14,6 @@ export class Utils {
             .replace(/-+$/, "");
     }
 
-    static arrayDistinct<T>(arr: T[]): T[] {
-        return arr.filter((value, index, self) => self.indexOf(value) === index);
-    }
-
-    static arrayRemove<T>(arr: T[], item: T): T[] {
-        let i = 0;
-
-        while (i < arr.length) {
-            if (arr[i] === item) {
-                arr.splice(i, 1);
-            } else {
-                ++i;
-            }
-        }
-
-        return arr;
-    }
-
-    static arrayRemoveIf<T>(arr: T[], predicate: (item: T, index: number) => boolean): T[] {
-        let i = 0;
-
-        while (i < arr.length) {
-            if (predicate(arr[i], i)) {
-                arr.splice(i, 1);
-            } else {
-                ++i;
-            }
-        }
-
-        return arr;
-    }
-
     static passedSince(date: Date | undefined, now: Date = new Date()): string {
         if (!date) {
             return "";
@@ -111,26 +79,34 @@ export class Utils {
     static lerp(a: number, b: number, alpha: number): number {
         return a + alpha * (b - a);
     }
-}
 
-declare global {
-    interface Array<T> {
-        distinct(): Array<T>;
+    static arrayRemoveIf<T>(array: T[], predicate: (item: T) => boolean): T[] {
+        const copy = [...array];
+        let index = copy.findIndex(predicate);
 
-        remove(item: T): Array<T>;
+        while (index >= 0) {
+            copy.splice(index, 1);
+            index = copy.findIndex(predicate);
+        }
 
-        removeIf(predicate: (item: T, index: number) => boolean): Array<T>;
+        return copy;
+    }
+
+    static recordRemoveByKey<T>(record: Record<string, T>, key: string): Record<string, T> {
+        const copy = { ...record };
+
+        delete copy[key];
+
+        return copy;
+    }
+
+    static recordAdd<T>(record: Record<string, T>, key: string, value: T): Record<string, T> {
+        return { ...record, [key]: value };
+    }
+
+    static recordToArray<T, U = { key: string; value: T }>(record: Record<string, T>): { key: string; value: T }[];
+    static recordToArray<T, U>(record: Record<string, T>, mapper: (key: string, value: T) => U): U[];
+    static recordToArray<T, U>(record: Record<string, T>, mapper?: (key: string, value: T) => U): U[] {
+        return Object.entries(record).map(([key, value]) => (mapper ? mapper(key, value) : { key, value })) as U[];
     }
 }
-
-Array.prototype.distinct = function () {
-    return Utils.arrayDistinct(this);
-};
-
-Array.prototype.remove = function (item) {
-    return Utils.arrayRemove(this, item);
-};
-
-Array.prototype.removeIf = function (predicate: (item: any, index: number) => boolean) {
-    return Utils.arrayRemoveIf(this, predicate);
-};

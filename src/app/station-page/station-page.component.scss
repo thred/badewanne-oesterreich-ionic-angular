@@ -1,16 +1,21 @@
 .center-content {
     display: flex;
-    height: 90vh;
+    height: calc(100vh - 96px);
     flex-direction: column;
     align-items: stretch;
-    align-content: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 2s ease-in-out;
+    justify-content: stretch;
+    gap: 1rem;
 
-    &.visible {
-        opacity: 1;
+    .scale {
+        flex: 1 1 auto;
     }
+}
+
+.text-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .time {

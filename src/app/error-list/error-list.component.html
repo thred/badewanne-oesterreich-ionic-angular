@@ -1,0 +1,12 @@
+<ion-list>
+    @for (error of errors(); track error) {
+        <ion-item lines="none" color="danger">
+            <ion-label>
+                <h2>{{ error.sourceName }}</h2>
+                <p>{{ error.message }}</p>
+            </ion-label>
+
+            <ion-icon slot="end" name="reload" (click)="refresh.emit(error)"></ion-icon>
+        </ion-item>
+    }
+</ion-list>

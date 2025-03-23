@@ -1,10 +1,10 @@
-import { Component, computed, inject } from "@angular/core";
-import { IonicModule } from "@ionic/angular";
+import { AfterViewInit, Component, computed, effect, inject, signal } from "@angular/core";
+import { IonicModule, RefresherEventDetail } from "@ionic/angular";
 import { AppService } from "../app.service";
-import { Station } from "../station/station";
+import { ErrorListComponent } from "../error-list/error-list.component";
 import { StationService } from "../station/station.service";
 import { ThermometerComponent } from "../thermometer/thermometer.component";
-import { promisedSignal } from "../utils/pomised.signal";
+import { persistedSignal } from "../utils/persisted.signal";
 import { routeParamSignal } from "../utils/route-param.signal";
 import { Utils } from "../utils/utils";
 
@@ -12,17 +12,19 @@ import { Utils } from "../utils/utils";
     selector: "app-station-page",
     templateUrl: "./station-page.component.html",
     styleUrls: ["./station-page.component.scss"],
-    imports: [IonicModule, ThermometerComponent],
+    imports: [IonicModule, ThermometerComponent, ErrorListComponent],
 })
-export class StationPageComponent {
+export class StationPageComponent implements AfterViewInit {
     private readonly appService = inject(AppService);
     private readonly stationService = inject(StationService);
 
     readonly sourceKey = routeParamSignal<string | undefined>("sourceKey");
-
     readonly stationKey = routeParamSignal<string | undefined>("stationKey");
 
-    readonly station = promisedSignal<Station | undefined>(() => {
+    readonly persistedSourceKey = persistedSignal<string>("badewanne.sourceKey");
+    readonly persistedStationKey = persistedSignal<string>("badewanne.stationKey");
+
+    readonly station = computed(() => {
         const sourceKey = this.sourceKey();
         const stationKey = this.stationKey();
 
@@ -30,10 +32,12 @@ export class StationPageComponent {
             return undefined;
         }
 
-        return this.stationService.getStation(sourceKey, stationKey);
+        return this.stationService.findStation(sourceKey, stationKey);
     });
 
-    readonly loading = computed(() => this.station() === undefined);
+    readonly loading = signal(false);
+
+    readonly outdated = computed(() => this.station()?.outdated);
 
     get passedSince(): string {
         const date: Date | undefined = this.station()?.measuredAt;
@@ -41,8 +45,44 @@ export class StationPageComponent {
         return date ? Utils.passedSince(date) : "keine aktuellen Daten vorhanden";
     }
 
+    constructor() {
+        // If the station is not set in the path, use the persisted values and redirect if necessary.
+        effect(() => {
+            const persistedSourceKey = this.persistedSourceKey();
+            const persistedStationKey = this.persistedStationKey();
+
+            if (persistedSourceKey === undefined || persistedStationKey === undefined) {
+                return;
+            }
+
+            if (!this.sourceKey() || !this.stationKey()) {
+                if (persistedSourceKey && persistedStationKey) {
+                    // Redirect to the station page with the persisted values.
+                    this.appService.navigateToStation(persistedSourceKey, persistedStationKey, "instant");
+                } else {
+                    // No previous values have been stored, redirect to the list.
+                    this.appService.navigateToStationList("instant");
+                }
+            }
+        });
+
+        // Update the persisted values when the station changes.
+        effect(() => {
+            const station = this.station();
+
+            if (station) {
+                this.persistedSourceKey.set(station.sourceKey);
+                this.persistedStationKey.set(station.stationKey);
+            }
+        });
+    }
+
+    ngAfterViewInit(): void {
+        this.performRefresh();
+    }
+
     openStationList(): void {
-        this.appService.openStationList();
+        this.appService.navigateToStationList();
     }
 
     openSourceLink(): void {
@@ -50,6 +90,25 @@ export class StationPageComponent {
 
         if (station) {
             this.appService.openSourceLink(station.sourceKey);
+        }
+    }
+
+    async performRefresh(event?: CustomEvent<RefresherEventDetail>): Promise<void> {
+        event?.detail.complete();
+
+        const sourceKey = this.sourceKey();
+        const stationKey = this.stationKey();
+
+        if (!sourceKey || !stationKey) {
+            return;
+        }
+
+        this.loading.set(true);
+
+        try {
+            await this.stationService.refreshStation(sourceKey, stationKey);
+        } finally {
+            this.loading.set(false);
         }
     }
 }

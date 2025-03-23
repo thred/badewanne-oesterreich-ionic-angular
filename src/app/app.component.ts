@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { StationService } from "./station/station.service";
 
 @Component({
@@ -7,10 +7,10 @@ import { StationService } from "./station/station.service";
     styleUrls: ["app.component.scss"],
     standalone: false,
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
     private readonly stationService = inject(StationService);
 
     ngOnInit(): void {
-        this.stationService.refreshAll();
+        setInterval(() => this.stationService.refreshAll(), StationService.REFRESH_MILLIS);
     }
 }

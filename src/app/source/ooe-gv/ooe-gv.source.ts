@@ -1,4 +1,3 @@
-import { Reference } from "src/app/station/reference";
 import { Sample } from "src/app/station/sample";
 import { Station } from "src/app/station/station";
 import { Utils } from "../../utils/utils";
@@ -13,8 +12,6 @@ export class OoeGvSource implements Source {
     private polledAt: Date = new Date();
     private nextPollAtMillis: number = this.polledAt.getTime();
     private items?: Promise<OoeGvItem[]>;
-    private error?: string;
-    private loading: boolean = false;
 
     get key(): string {
         return "ooe-gv";
@@ -36,12 +33,12 @@ export class OoeGvSource implements Source {
         return OoeGvSource.MINIMUM_POLLING_INTERVAL;
     }
 
-    async getReferences(): Promise<Reference[]> {
+    async getAllStations(): Promise<Station[]> {
         const items = await this.getItems();
 
         return items.map(
             (item) =>
-                new Reference(
+                new Station(
                     this.key,
                     this.name,
                     item.key,
@@ -49,6 +46,7 @@ export class OoeGvSource implements Source {
                     item.site,
                     item.temperature,
                     item.measuredAt,
+                    [],
                     item.polledAt,
                     item.error,
                 ),
@@ -74,23 +72,11 @@ export class OoeGvSource implements Source {
             );
         }
 
-        let error = `The item "${key}" is missing in the data of "${this.name}".`;
-
-        if (this.error) {
-            error += ` ${this.error}`;
-        }
-
-        return new Station(
+        return Station.unknownStation(
             this.key,
             this.name,
             key,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            [],
-            this.polledAt,
-            this.error,
+            `Die Station "${key}" fehlt in den Daten von "${this.name}".`,
         );
     }
 
@@ -105,17 +91,16 @@ export class OoeGvSource implements Source {
 
         this.polledAt = polledAt;
         this.nextPollAtMillis = polledAtMillis + this.minimumPollingInterval;
-        this.error = undefined;
 
-        this.items = new Promise(async (resolve) => {
+        this.items = new Promise(async (resolve, reject) => {
             try {
                 let binary: string = await this.fetchData();
 
                 resolve(this.parse(binary, polledAt));
             } catch (error) {
-                this.error = `${error}`;
+                this.nextPollAtMillis = polledAtMillis;
 
-                resolve([]);
+                reject(error);
             }
         });
 
@@ -250,6 +235,7 @@ export class OoeGvSource implements Source {
         s = s.replace("Bootsh�tte", "Bootshütte");
         s = s.replace("Wei�enbach", "Weißenbach");
         s = s.replace("Fu�g�ngersteg", "Fußgängersteg");
+        s = s.replace("�sterlehen", "Österlehen");
 
         return s;
     }

@@ -1,0 +1,17 @@
+<ion-item>
+    <ion-icon
+        slot="start"
+        [name]="favorite() ? 'heart' : 'heart-outline'"
+        color="secondary"
+        (click)="toggleFavorite.emit(station())"
+    ></ion-icon>
+
+    <ion-label (click)="open.emit(station())">
+        <h2>{{ station().stationName }}</h2>
+        <p>{{ station().stationSite }}</p>
+    </ion-label>
+
+    @if (!station().outdated) {
+        <ion-note>{{ station().temperature?.toFixed(1) }}°C</ion-note>
+    }
+</ion-item>
