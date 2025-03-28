@@ -1,4 +1,4 @@
-import { enableProdMode } from "@angular/core";
+import { enableProdMode, provideExperimentalZonelessChangeDetection } from "@angular/core";
 
 import { bootstrapApplication } from "@angular/platform-browser";
 import { RouteReuseStrategy } from "@angular/router";
@@ -15,6 +15,7 @@ if (environment.production) {
 
 bootstrapApplication(AppComponent, {
     providers: [
+        provideExperimentalZonelessChangeDetection(),
         { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
         provideIonicAngular({ mode: "ios" }),
         provideRouter(routes),

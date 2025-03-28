@@ -3,7 +3,7 @@ import { CapacitorConfig } from "@capacitor/cli";
 const config: CapacitorConfig = {
     appId: "io.github.thred.badewanne",
     appName: "Badewanne Österreich",
-    webDir: "www",
+    webDir: "www/browser",
     server: {
         androidScheme: "https",
     },

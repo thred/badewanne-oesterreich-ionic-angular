@@ -57,6 +57,11 @@ export class StationListPageComponent implements AfterViewInit {
     readonly favorites = persistedSignal<string[]>("badewanne.favorites");
 
     readonly stations = computed<(Station & Favoritable)[]>(() => {
+        if (this.favorites() === undefined) {
+            // we wait for the storage to be ready to void rendering without favorites
+            return [];
+        }
+
         const stations: (Station & Favoritable)[] = this.stationService
             .stations()
             .filter((station) => station.matches(this.filter()));
@@ -68,9 +73,13 @@ export class StationListPageComponent implements AfterViewInit {
         return stations;
     });
 
-    readonly favoriteStations = computed(() => this.stations().filter((station) => station.favorite));
+    readonly favoriteStations = computed(() => {
+        return this.stations().filter((station) => station.favorite);
+    });
 
-    readonly otherStations = computed(() => this.stations().filter((station) => !station.favorite));
+    readonly otherStations = computed(() => {
+        return this.stations().filter((station) => !station.favorite);
+    });
 
     ngAfterViewInit(): void {
         this.refreshAll();
