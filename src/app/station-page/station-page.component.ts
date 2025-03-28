@@ -1,5 +1,16 @@
 import { AfterViewInit, Component, computed, effect, inject, signal } from "@angular/core";
-import { IonicModule, RefresherEventDetail } from "@ionic/angular";
+import {
+    IonContent,
+    IonFab,
+    IonFabButton,
+    IonIcon,
+    IonRefresher,
+    IonSpinner,
+    IonText,
+    RefresherEventDetail,
+} from "@ionic/angular/standalone";
+import { addIcons } from "ionicons";
+import { menuOutline } from "ionicons/icons";
 import { AppService } from "../app.service";
 import { ErrorListComponent } from "../error-list/error-list.component";
 import { StationService } from "../station/station.service";
@@ -12,7 +23,17 @@ import { Utils } from "../utils/utils";
     selector: "app-station-page",
     templateUrl: "./station-page.component.html",
     styleUrls: ["./station-page.component.scss"],
-    imports: [IonicModule, ThermometerComponent, ErrorListComponent],
+    imports: [
+        IonContent,
+        IonRefresher,
+        IonText,
+        IonFab,
+        IonFabButton,
+        IonSpinner,
+        IonIcon,
+        ThermometerComponent,
+        ErrorListComponent,
+    ],
 })
 export class StationPageComponent implements AfterViewInit {
     private readonly appService = inject(AppService);
@@ -46,6 +67,8 @@ export class StationPageComponent implements AfterViewInit {
     }
 
     constructor() {
+        addIcons({ menuOutline });
+
         // If the station is not set in the path, use the persisted values and redirect if necessary.
         effect(() => {
             const persistedSourceKey = this.persistedSourceKey();

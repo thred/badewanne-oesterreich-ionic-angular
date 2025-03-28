@@ -1,12 +1,14 @@
 import { Component, computed, inject, input, output } from "@angular/core";
-import { IonicModule } from "@ionic/angular";
+import { IonIcon, IonItem, IonLabel, IonList } from "@ionic/angular/standalone";
+import { addIcons } from "ionicons";
+import { reload } from "ionicons/icons";
 import { StationError, StationService } from "../station/station.service";
 
 @Component({
     selector: "app-error-list",
     templateUrl: "./error-list.component.html",
     styleUrls: ["./error-list.component.scss"],
-    imports: [IonicModule],
+    imports: [IonList, IonItem, IonLabel, IonIcon],
 })
 export class ErrorListComponent {
     private readonly stationService = inject(StationService);
@@ -16,4 +18,8 @@ export class ErrorListComponent {
     readonly maxErrors = input(3);
 
     readonly refresh = output<StationError>();
+
+    constructor() {
+        addIcons({ reload });
+    }
 }

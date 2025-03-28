@@ -13,9 +13,7 @@ export interface StationError {
     message: string;
 }
 
-@Injectable({
-    providedIn: "root",
-})
+@Injectable()
 export class StationService {
     static readonly REFRESH_MILLIS = isDevMode() ? 1000 * 60 * 5 : 1000 * 60 * 15;
 

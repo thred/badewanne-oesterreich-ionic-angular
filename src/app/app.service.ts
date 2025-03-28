@@ -1,13 +1,11 @@
 import { Injectable, inject } from "@angular/core";
-import { NavController } from "@ionic/angular";
+import { NavController } from "@ionic/angular/standalone";
 import { Source } from "./source/source";
 import { StationService } from "./station/station.service";
 
 type NavDirection = "forward" | "backward" | "instant";
 
-@Injectable({
-    providedIn: "root",
-})
+@Injectable()
 export class AppService {
     private readonly stationService = inject(StationService);
     private readonly navController = inject(NavController);

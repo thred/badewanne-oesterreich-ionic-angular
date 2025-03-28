@@ -1,5 +1,19 @@
 import { AfterViewInit, Component, computed, inject, signal } from "@angular/core";
-import { IonicModule, RefresherEventDetail, SearchbarInputEventDetail, ToastController } from "@ionic/angular";
+import {
+    IonContent,
+    IonHeader,
+    IonLabel,
+    IonList,
+    IonListHeader,
+    IonProgressBar,
+    IonRefresher,
+    IonSearchbar,
+    IonTitle,
+    IonToolbar,
+    RefresherEventDetail,
+    SearchbarInputEventDetail,
+    ToastController,
+} from "@ionic/angular/standalone";
 import { IonSearchbarCustomEvent } from "@ionic/core";
 import { AppService } from "../app.service";
 import { ErrorListComponent } from "../error-list/error-list.component";
@@ -16,7 +30,20 @@ type Favoritable = {
     selector: "app-station-list-page",
     templateUrl: "./station-list-page.component.html",
     styleUrls: ["./station-list-page.component.scss"],
-    imports: [IonicModule, StationListItemComponent, ErrorListComponent],
+    imports: [
+        IonHeader,
+        IonContent,
+        IonToolbar,
+        IonTitle,
+        IonSearchbar,
+        IonProgressBar,
+        IonRefresher,
+        IonList,
+        IonListHeader,
+        IonLabel,
+        StationListItemComponent,
+        ErrorListComponent,
+    ],
 })
 export class StationListPageComponent implements AfterViewInit {
     private readonly appService = inject(AppService);
