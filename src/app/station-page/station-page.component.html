@@ -1,10 +1,10 @@
 <ion-content [fullscreen]="true">
     <ion-refresher slot="fixed" (ionRefresh)="performRefresh($event)" [pullMin]="25" [pullMax]="50" />
 
-    <div class="center-content">
-        <app-error-list (refresh)="performRefresh()" [maxErrors]="1" />
+    <app-error-list (refresh)="performRefresh()" [maxErrors]="1" />
 
-        <app-thermometer class="scale" [temperature]="station()?.temperature ?? 0"></app-thermometer>
+    <div class="center-content">
+        <app-thermometer class="thermometer" [temperature]="station()?.temperature ?? 0"></app-thermometer>
 
         <div class="text-content">
             <ion-text class="ion-text-center"
